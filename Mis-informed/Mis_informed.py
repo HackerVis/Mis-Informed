@@ -8,9 +8,6 @@ from requests_html import HTML
 from requests_html import HTMLSession
 import threading
 from newspaper import Article
-from readability.readability import Document as Paper
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
 # Take in user input for the link of the website and the keywords of the article
 topic = input("Enter the article name: ")
 link = input("Enter a website link: ")
@@ -81,16 +78,16 @@ def alternate_articles(topic):
     news_outlets = ['cnn.com', 'bbc.com', 'foxnews.com', 'nbcnews.com']
  
     for outlet in news_outlets:
-        link = "https://" + outlet + "/" + topic
+        link = "https://www.cnn.com/2023/01/23/us/half-moon-bay-california-shooting-incident/index.html"
         article = Article(link)
         article.download()
         article.parse()
         # Loop through each article
-        if articles:
-            for article in articles:
-                print(article.find('h2').text)
-        else:
-           i += 1
+        #if articles:
+        #    for article in articles:
+        #        print(article.find('h2').text)
+        #else:
+        #   i += 1
 
     
 

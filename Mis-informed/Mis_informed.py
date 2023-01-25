@@ -28,18 +28,8 @@ def get_domain_type(link):
 # Identify if the site type it's posted on gives or takes credibility away
 def domain_percentage(top_level_domain):
     global informative_percent
-    if(top_level_domain == 'com'):
-        informative_percent += 4
-    elif(top_level_domain == 'net'):
-        informative_percent += 2
-    elif(top_level_domain == 'org'):
-        informative_percent += 3
-    elif(top_level_domain == 'gov'):
-        informative_percent += 1
-    elif(top_level_domain == 'blog'):
-        informative_percent += 5
-    elif(top_level_domain == 'edu'):
-        informative_percent += 1
+    top_levels = {"com" : 4, "net" : 2, "org" : 3, "gov" : 1, "blog" : 5, "edu" : 1}
+    informative_percent += top_levels[top_level_domain]
 
 # Identify if the source website is reliable
 def is_domain_safe(domain_name):

@@ -6,7 +6,7 @@ from newspaper import Article
 import datetime
 
 # Take in user input for the link of the website and the keywords of the article
-link = input("Enter a website link: ")
+# link = input("Enter a website link: ")
 
 # Starting Default Variables for us to interperet
 informative_percent = 5
@@ -134,22 +134,24 @@ def safety_text(informative_percent):
     
 
 
-# Update the value depending on the link type .com / .net / .org, etc
-top_level_domain = get_domain_type(link)
+def getMisinformation(link):
+    global informative_percent, domain_name, safetyResult, articles, top_level_domain, hostname, informative_link_for_input, domain_percentage, following_words, get_date_published, safety_text
+    # Update the value depending on the link type .com / .net / .org, etc
+    top_level_domain = get_domain_type(link)
 
-# Split the Url to give us the domain name
-hostname = urlsplit(link).hostname
-domain_name = ".".join(hostname.split(".")[-2:])
-domain_name = domain_name.split(".")[0]
+    # Split the Url to give us the domain name
+    hostname = urlsplit(link).hostname
+    domain_name = ".".join(hostname.split(".")[-2:])
+    domain_name = domain_name.split(".")[0]
 
-# Process the Likelyhood from the name of the link
-domain_percentage(top_level_domain)
-informative_link_for_input = informative_link_context(link)
-following_words(informative_link_for_input)
-get_date_published(link)
+    # Process the Likelyhood from the name of the link
+    domain_percentage(top_level_domain)
+    informative_link_for_input = informative_link_context(link)
+    following_words(informative_link_for_input)
+    get_date_published(link)
 
-# Analyze the reuslts
-safety_text(informative_percent)
-
+    # Analyze the reuslts
+    safety_text(informative_percent)
+    return informative_percent, safetyResult, domain_name
 # Print the result of the Misinformation Analysis
-print("The likelyhood of false information is ", informative_percent, "%, " + domain_name + " is " + safetyResult + " misinformation")
+# print("The likelyhood of false information is ", informative_percent, "%, " + domain_name + " is " + safetyResult + " misinformation")

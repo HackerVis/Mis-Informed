@@ -49,9 +49,14 @@ def get_domain_type(link):
         isBlog = True
         return
     else :
-        domain_type = urlsplit(link).hostname.split(".")[-1]
-        isBlog = False
-        return domain_type
+        if link == "NoneType" or link == "":
+            print("Error Reading Link")
+            raise SystemExit
+        else:
+            domain_type = urlsplit(link).hostname.split(".")[-1]
+            isBlog = False
+            return domain_type
+        
 
 # Identify if the site type it's posted on gives or takes credibility away
 def domain_percentage(top_level_domain):

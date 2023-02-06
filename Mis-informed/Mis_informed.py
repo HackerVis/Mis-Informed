@@ -102,13 +102,19 @@ def following_words(informative_link):
     span_tags = soup.find_all('span')
 
     # Iterate through the span tags
+    found_phrase = False
+    # Iterate through the span tags
     for span in span_tags:
         # Check if the text inside the tag matches one of the desired phrases
         if span.text in desired_phrases:
             print(f"Found desired phrase: {span.text}")
             reporting = {"VERY HIGH" : 5, "HIGH" : 5, "MOSTLY FACTUAL" : 15, "MIXED" : 27, "LOW" : 45, "VERY LOW" : 45}
             informative_percent += reporting[span.text]
-            return
+            found_phrase = True
+            break
+
+    if not found_phrase:
+        informative_percent += 27
 
 # Update the value depending on the link type .com / .net / .org, etc
 top_level_domain = get_domain_type(link)

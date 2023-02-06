@@ -24,20 +24,26 @@ def get_date_published(link):
     article = Article(link)
     article.download()
     article.parse()
-    date_published = article.publish_date
 
-    publish_date = article.publish_date
+    try:
+        publish_date = article.publish_date
+    except AttributeError:
+        publish_date = 10
     today = datetime.datetime.now()
 
-    delta = today - publish_date
 
-    years_since_publish = int(delta.days / 365)
-
-    dates = {0 : 5, 1 : 2, 2 : 3, 3 : 4, 4 : 5}
-    if (years_since_publish <= 4):
-        informative_percent += dates[years_since_publish]
+    if publish_date != None:
+        delta = today - publish_date
+        years_since_publish = int(delta.days / 365)
+        dates = {0 : 5, 1 : 2, 2 : 3, 3 : 4, 4 : 5}
+        if (years_since_publish <= 4):
+            informative_percent += dates[years_since_publish]
+        else:
+            informative_percent += 5
     else:
         informative_percent += 5
+
+    
 
 # Retrieve the "Top Level Domain Type" from the given link
 def get_domain_type(link):
@@ -103,29 +109,6 @@ def following_words(informative_link):
             reporting = {"VERY HIGH" : 5, "HIGH" : 5, "MOSTLY FACTUAL" : 15, "MIXED" : 27, "LOW" : 45, "VERY LOW" : 45}
             informative_percent += reporting[span.text]
             return
-        
-#    global informative_percent
-#    # List of news outlets to scrape
-#    news_outlets = ['cnn.com', 'bbc.com', 'foxnews.com', 'nbcnews.com']
-#    i = 0
-#
-#    temp_percent = 0
-#
-#    # Loop through each news outlet
-#    for outlet in news_outlets:
-#        # Send GET request to website
-#       #response = requests.get(f'https://www.{outlet}/search?q={topic}')
-#        response = https://www.cnn.com/us/live-news/half-moon-bay-california-shooting-1-23-23/index.html
-#        soup = BeautifulSoup(response.content, 'html.parser')
-#        # Find all articles on the page
-#        articles = soup.find_all('article')
-#        # Loop through each article
-#        if articles:
-#            for article in articles:
-#                print(article.find('h2').text)
-#       else:
-#           i += 1
-#    informative_percent += (i * 10)
 
 # Update the value depending on the link type .com / .net / .org, etc
 top_level_domain = get_domain_type(link)

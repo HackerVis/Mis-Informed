@@ -8,8 +8,9 @@ from requests_html import HTML
 from requests_html import HTMLSession
 import threading
 from newspaper import Article
+import datetime
+
 # Take in user input for the link of the website and the keywords of the article
-topic = input("Enter the article name: ")
 link = input("Enter a website link: ")
 
 # Starting Default Variables for us to interperet
@@ -17,39 +18,37 @@ informative_percent = 5
 safetyResult = ''
 articles = ''
 
+# Retrieve The Date Published of the Article
+def get_date_published(link):
+    global informative_percent
+    article = Article(link)
+    article.download()
+    article.parse()
+    date_published = article.publish_date
+
+    publish_date = article.publish_date
+    today = datetime.datetime.now()
+
+    delta = today - publish_date
+
+    years_since_publish = int(delta.days / 365)
+
+    dates = {0 : 5, 1 : 2, 2 : 3, 3 : 4, 4 : 5}
+    if (years_since_publish <= 4):
+        informative_percent += dates[years_since_publish]
+    else:
+        informative_percent += 5
+
 # Retrieve the "Top Level Domain Type" from the given link
 def get_domain_type(link):
-    match = re.search(r'\.(\w+)$', link)
-    if match:
-        return match.group(1)
-    else:
-        return None
+    domain_type = urlsplit(link).hostname.split(".")[-1]
+    return domain_type
 
 # Identify if the site type it's posted on gives or takes credibility away
 def domain_percentage(top_level_domain):
     global informative_percent
-    top_levels = {"com" : 4, "net" : 2, "org" : 3, "gov" : 1, "blog" : 5, "edu" : 1}
+    top_levels = {"com" : 4, "net" : 2, "org" : 3, "gov" : 1, "blog" : 5, "edu" : 1, "co" : 4, "mil" : 1}
     informative_percent += top_levels[top_level_domain]
-
-# Identify if the source website is reliable
-def is_domain_safe(domain_name):
-    global informative_percent
-    if(domain_name == "cnn"):
-        informative_percent += 15
-    elif(domain_name == "bbc"):
-        informative_percent += 5
-    elif(domain_name == "nbcnews"):
-        informative_percent += 5
-    elif(domain_name == "nytimes"):
-        informative_percent += 5
-    elif(domain_name == "foxnews"):
-        informative_percent += 15
-    elif(domain_name == "wsj"):
-        informative_percent += 15
-    elif(domain_name == "usatoday"):
-        informative_percent += 15
-    else:
-        informative_percent += 50
 
 # Anlyize the value of the misinformation percent
 def safety_text(informative_percent):
@@ -63,26 +62,48 @@ def safety_text(informative_percent):
     elif(informative_percent >= 75):
         safetyResult = "highly likely"
 
-def alternate_articles(topic):
 
-    news_outlets = ['cnn.com', 'bbc.com', 'foxnews.com', 'nbcnews.com']
- 
-    for outlet in news_outlets:
-        link = "https://www.cnn.com/2023/01/23/us/half-moon-bay-california-shooting-incident/index.html"
-        article = Article(link)
-        article.download()
-        article.parse()
-        # Loop through each article
-        #if articles:
-        #    for article in articles:
-        #        print(article.find('h2').text)
-        #else:
-        #   i += 1
+def informative_link_context(link):
+    global domain_name
+    informative_link_edited = "https://mediabiasfactcheck.com/" + domain_name + "/"
+    return informative_link_edited
 
-    
+def following_words(informative_link):
+    global informative_percent
+    response = requests.get(informative_link)
 
-    print("Title: ", article.title)
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Extract the text from the response
+        html_content = response.text
+    else:
+        raise Exception(f"Request to {url} failed with status code {response.status_code}")
 
+    # Use BeautifulSoup to parse the HTML content
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    # Desired phrases to search for
+    desired_phrases = [
+        "VERY HIGH",
+        "HIGH",
+        "MOSTLY FACTUAL",
+        "MIXED",
+        "LOW",
+        "VERY LOW"
+    ]
+
+    # Find all span tags
+    span_tags = soup.find_all('span')
+
+    # Iterate through the span tags
+    for span in span_tags:
+        # Check if the text inside the tag matches one of the desired phrases
+        if span.text in desired_phrases:
+            print(f"Found desired phrase: {span.text}")
+            reporting = {"VERY HIGH" : 5, "HIGH" : 5, "MOSTLY FACTUAL" : 15, "MIXED" : 27, "LOW" : 45, "VERY LOW" : 45}
+            informative_percent += reporting[span.text]
+            return
+        
 #    global informative_percent
 #    # List of news outlets to scrape
 #    news_outlets = ['cnn.com', 'bbc.com', 'foxnews.com', 'nbcnews.com']
@@ -111,12 +132,16 @@ top_level_domain = get_domain_type(link)
 
 # Split the Url to give us the domain name
 hostname = urlsplit(link).hostname
-domain_name = ".".join(hostname.split(".")[:-1])
+domain_name = ".".join(hostname.split(".")[-2:])
+domain_name = domain_name.split(".")[0]
 
 # Process the Likelyhood from the name of the link
 domain_percentage(top_level_domain)
-is_domain_safe(domain_name)
-alternate_articles(topic)
+
+informative_link_for_input = informative_link_context(link)
+following_words(informative_link_for_input)
+
+get_date_published(link)
 
 # Analyze the reuslts
 safety_text(informative_percent)

@@ -2,8 +2,6 @@ import urllib
 from urllib.parse import urlsplit
 from bs4 import BeautifulSoup
 import requests
-from requests_html import HTML
-from requests_html import HTMLSession
 from newspaper import Article
 import datetime
 

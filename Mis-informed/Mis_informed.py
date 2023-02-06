@@ -1,12 +1,9 @@
-import re
 import urllib
 from urllib.parse import urlsplit
 from bs4 import BeautifulSoup
 import requests
-import pandas as pd
 from requests_html import HTML
 from requests_html import HTMLSession
-import threading
 from newspaper import Article
 import datetime
 
@@ -82,39 +79,44 @@ def following_words(informative_link):
     if response.status_code == 200:
         # Extract the text from the response
         html_content = response.text
+
+        # Use BeautifulSoup to parse the HTML content
+        soup = BeautifulSoup(html_content, 'html.parser')
+
+        # Desired phrases to search for
+        desired_phrases = [
+            "VERY HIGH",
+            "HIGH",
+            "MOSTLY FACTUAL",
+            "MIXED",
+            "LOW",
+            "VERY LOW"
+        ]
+
+        # Find all span tags
+        span_tags = soup.find_all('span')
+
+        # Iterate through the span tags
+        found_phrase = False
+        # Iterate through the span tags
+        for span in span_tags:
+            # Check if the text inside the tag matches one of the desired phrases
+            if span.text in desired_phrases:
+                print(f"Found desired phrase: {span.text}")
+                reporting = {"VERY HIGH" : 5, "HIGH" : 5, "MOSTLY FACTUAL" : 15, "MIXED" : 27, "LOW" : 45, "VERY LOW" : 45}
+                informative_percent += reporting[span.text]
+                found_phrase = True
+                break
+
+        if not found_phrase:
+            informative_percent += 27
+
     else:
-        raise Exception(f"Request to {url} failed with status code {response.status_code}")
+        informative_percent += 45
+        return
+        
 
-    # Use BeautifulSoup to parse the HTML content
-    soup = BeautifulSoup(html_content, 'html.parser')
-
-    # Desired phrases to search for
-    desired_phrases = [
-        "VERY HIGH",
-        "HIGH",
-        "MOSTLY FACTUAL",
-        "MIXED",
-        "LOW",
-        "VERY LOW"
-    ]
-
-    # Find all span tags
-    span_tags = soup.find_all('span')
-
-    # Iterate through the span tags
-    found_phrase = False
-    # Iterate through the span tags
-    for span in span_tags:
-        # Check if the text inside the tag matches one of the desired phrases
-        if span.text in desired_phrases:
-            print(f"Found desired phrase: {span.text}")
-            reporting = {"VERY HIGH" : 5, "HIGH" : 5, "MOSTLY FACTUAL" : 15, "MIXED" : 27, "LOW" : 45, "VERY LOW" : 45}
-            informative_percent += reporting[span.text]
-            found_phrase = True
-            break
-
-    if not found_phrase:
-        informative_percent += 27
+    
 
 # Update the value depending on the link type .com / .net / .org, etc
 top_level_domain = get_domain_type(link)

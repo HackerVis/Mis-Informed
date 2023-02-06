@@ -12,6 +12,7 @@ link = input("Enter a website link: ")
 informative_percent = 5
 safetyResult = ''
 articles = ''
+isBlog = False
 
 # Retrieve The Date Published of the Article
 def get_date_published(link):
@@ -42,27 +43,26 @@ def get_date_published(link):
 
 # Retrieve the "Top Level Domain Type" from the given link
 def get_domain_type(link):
-    domain_type = urlsplit(link).hostname.split(".")[-1]
-    return domain_type
+    global isBlog
+    if "blog" in link:
+        domain_type = urlsplit(link).hostname.split(".")[-1]
+        isBlog = True
+        return
+    else :
+        domain_type = urlsplit(link).hostname.split(".")[-1]
+        isBlog = False
+        return domain_type
 
 # Identify if the site type it's posted on gives or takes credibility away
 def domain_percentage(top_level_domain):
     global informative_percent
-    top_levels = {"com" : 4, "net" : 2, "org" : 3, "gov" : 1, "blog" : 5, "edu" : 1, "co" : 4, "mil" : 1}
-    informative_percent += top_levels[top_level_domain]
+    global isBlog
 
-# Anlyize the value of the misinformation percent
-def safety_text(informative_percent):
-    global safetyResult
-    if(informative_percent < 25):
-        safetyResult = "highly unlikely"
-    elif(informative_percent < 50):
-        safetyResult = "unlikely"
-    elif(informative_percent >= 50):
-        safetyResult = "likely"
-    elif(informative_percent >= 75):
-        safetyResult = "highly likely"
-
+    if isBlog : 
+        informative_percent += 5
+    else:
+        top_levels = {"com" : 4, "net" : 2, "org" : 3, "gov" : 1, "edu" : 1, "co" : 4, "mil" : 1}
+        informative_percent += top_levels[top_level_domain]  
 
 def informative_link_context(link):
     global domain_name
@@ -113,8 +113,21 @@ def following_words(informative_link):
         informative_percent += 45
         return
         
-
+# Anlyize the value of the misinformation percent
+def safety_text(informative_percent):
+    global safetyResult
+    if(informative_percent > 50):
+        if(informative_percent < 60):
+            safetyResult = "likely"
+        elif(informative_percent >= 60):
+            safetyResult = "highly likely"
+    else:
+        if(informative_percent <= 35):
+            safetyResult = "highly unlikely"
+        elif(informative_percent < 50):
+            safetyResult = "unlikely"
     
+
 
 # Update the value depending on the link type .com / .net / .org, etc
 top_level_domain = get_domain_type(link)
@@ -126,10 +139,8 @@ domain_name = domain_name.split(".")[0]
 
 # Process the Likelyhood from the name of the link
 domain_percentage(top_level_domain)
-
 informative_link_for_input = informative_link_context(link)
 following_words(informative_link_for_input)
-
 get_date_published(link)
 
 # Analyze the reuslts

@@ -152,6 +152,8 @@ def getMisinformation(link):
 
     # Analyze the reuslts
     safety_text(informative_percent)
-    return informative_percent, safetyResult, domain_name
+    i, s, d = informative_percent, safetyResult, domain_name
+    informative_percent, safetyResult, domain_name = 0, '', ''
+    return i, s, d
 # Print the result of the Misinformation Analysis
 # print("The likelyhood of false information is ", informative_percent, "%, " + domain_name + " is " + safetyResult + " misinformation")

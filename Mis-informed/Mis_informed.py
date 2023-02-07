@@ -66,8 +66,11 @@ def domain_percentage(top_level_domain):
     if isBlog : 
         informative_percent += 5
     else:
-        top_levels = {"com" : 4, "net" : 2, "org" : 3, "gov" : 1, "edu" : 1, "co" : 4, "mil" : 1}
-        informative_percent += top_levels[top_level_domain]  
+        if top_level_domain not in top_levels:
+            informative_percent += 5
+        else:
+            top_levels = {"com" : 4, "net" : 2, "org" : 3, "gov" : 1, "edu" : 1, "co" : 4, "mil" : 1}
+            informative_percent += top_levels[top_level_domain]  
 
 def informative_link_context(link):
     global domain_name

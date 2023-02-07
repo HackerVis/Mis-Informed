@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Result </title>
+    </head>
+    <body>
+        {%if site %}
+        <h1> Result </h1>
+        <p>The likelyhood of false information is {{ informative_percent }}% for {{site}} which is {{safetyResult}} misinformation </p>
+        {%else%}
+        <h1> Error </h1>
+        <p> The site is not valid </p>
+        {%endif%}
+    </body>
+</html>
+

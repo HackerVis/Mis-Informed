@@ -20,7 +20,7 @@ def check():
         url = request.form['url']
         site = url
         informative_percent, safetyResult, domain_name = getMisinformation(site)
-        return render_template('index.html', site = domain_name, informative_percent = informative_percent, safetyResult = safetyResult) # The check page
+        return render_template('result.html', site = domain_name, informative_percent = informative_percent, safetyResult = safetyResult) # The check page
     else:
         return render_template('index.html')
 

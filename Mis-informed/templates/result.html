@@ -2,15 +2,42 @@
 <html>
     <head>
         <title> Result </title>
+        {% if site %}
+        <meta name="description" content="The likelyhood of false information is {{ informative_percent }}% for {{site}} which is {{safetyResult}} misinformation">
+        {%if informative_percent < 50%}
+        <style>
+            body {
+                background-color: green;
+            }
+        </style>
+        {%endif%}
+        {%if informative_percent > 50 and informative_percent < 60%}
+        <style>
+            body {
+                background-color: yellow;
+            }
+        </style>
+        {%endif%}
+        {%if informative_percent > 60%}
+        <style>
+            body {
+                background-color: red;
+            }
+        </style>
+        {%endif%}
+        {% else %}
+        <meta name="description" content="The site is not valid">
+        {% endif %}
+
     </head>
     <body>
-        {%if site %}
+        {% if site %}
         <h1> Result </h1>
         <p>The likelyhood of false information is {{ informative_percent }}% for {{site}} which is {{safetyResult}} misinformation </p>
-        {%else%}
+        {% else %}
         <h1> Error </h1>
         <p> The site is not valid </p>
-        {%endif%}
+        {% endif %}
     </body>
 </html>
 
